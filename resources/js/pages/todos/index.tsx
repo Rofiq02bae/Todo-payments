@@ -1,10 +1,9 @@
 import { Head, Link } from "@inertiajs/react";
 
-// Removed import of backend controller which is not available in the frontend bundle.
-// Use a client-side route string instead.
 import TodoCard from "@/components/TodoCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { usePayment } from "@/hooks/usePayment";
 
 type Todo = {
     id: number;
@@ -18,7 +17,9 @@ type Todo = {
 type Props = {
   todos: Todo[];
 };
-export default function index({ todos }: Props) {
+export default function Index({ todos }: Props) {
+  const { exportPdf, loading } = usePayment();
+
   return (
     <>
       <Head>
@@ -36,7 +37,7 @@ export default function index({ todos }: Props) {
             <div className="mb-4 flex flex-col gap-3">
               {todos.length > 0 ? (
                 todos.map((todo) => (
-                  <TodoCard key={todo.id} todo={todo} />
+                  <TodoCard key={todo.id} todo={todo} onExport={exportPdf} loading={loading} />
                 ))
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -50,6 +51,7 @@ export default function index({ todos }: Props) {
                 Add New Task
               </Link>
             </Button>
+            
           </CardContent>
         </Card>
       </div>    

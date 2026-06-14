@@ -8,9 +8,11 @@ import type { Todo } from '@/types';
 
 type Props = {
     todo: Todo;
+    onExport: (id: number) => void;
+    loading: boolean;
 };
 
-export default function TodoCard({ todo }: Props) {
+export default function TodoCard({ todo, onExport, loading }: Props) {
     const handleDelete = () => {
         if (window.confirm('Are you sure you want to delete this todo?')) {
             router.delete(TodoController.destroy.url(todo));
@@ -38,10 +40,12 @@ export default function TodoCard({ todo }: Props) {
                         <Pencil className="size-3.5" />
                         Edit
                     </Link>
-                    <Link href={TodoController.edit.url(todo)}>
-                        <Pencil className="size-3.5" />
-                        Edit
-                    </Link>
+                </Button>
+                <Button
+                    onClick={() => onExport(todo.id)}
+                    disabled={loading}
+                >
+                    Export PDF
                 </Button>
                 <Button variant="destructive" size="sm" onClick={handleDelete}>
                     <Trash2 className="size-3.5" />

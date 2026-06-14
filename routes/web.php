@@ -1,12 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TodoController;
+use App\Http\Controllers\PaymentController;
 
 Route::inertia('/', 'welcome')->name('home');
 
-Route::get('/todos', [App\Http\Controllers\TodoController::class, 'index']);
-Route::post('/todos', [App\Http\Controllers\TodoController::class, 'store']);
-Route::put('/todos/{id}', [App\Http\Controllers\TodoController::class, 'update']);
-Route::delete('/todos/{id}', [App\Http\Controllers\TodoController::class, 'destroy']);
-Route::get('/todos/create', [App\Http\Controllers\TodoController::class, 'create']);
-Route::get('/todos/{id}/edit', [App\Http\Controllers\TodoController::class, 'edit']);
+# routes for todo list
+Route::get('/todos', [TodoController::class, 'index']);
+Route::post('/todos', [TodoController::class, 'store']);
+Route::put('/todos/{id}', [TodoController::class, 'update']);
+Route::delete('/todos/{id}', [TodoController::class, 'destroy']);
+Route::get('/todos/create', [TodoController::class, 'create']);
+Route::get('/todos/{id}/edit', [TodoController::class, 'edit']);
+
+# routes for payment
+Route::get('/payments/create/{todo}', [PaymentController::class, 'create']) ->name('payments.create');

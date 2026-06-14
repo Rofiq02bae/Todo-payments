@@ -3,22 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Todo;
+use App\Models\Payment;
+use App\Services\MidtransService;
+use Illuminate\Http\JsonResponse;
 
 class PaymentController extends Controller
 {
-    //
-    public function createPayment($data)
+    public function __construct(MidtransService $midtransService)
     {
-        // Simulate payment processing logic
-        $payment = new self();
-        $payment->amount = $data['amount'];
-        $payment->status = 'pending';
-        $payment->save();
+        $this->midtransService = $midtransService;
+    }
 
-        // Simulate payment gateway response
-        $payment->status = 'completed';
-        $payment->save();
+    public function create(Todo $todo): JsonResponse
+    {
+        $payment = $this->midtransService->createPayment($todo);
 
-        return $payment;
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment created successfully',
+            'data' => [
+                'id' => $payment->id,
+                'todo_id' => $payment->todo_id,
+                'order_id' => $payment->order_id,
+                'amount' => $payment->amount,
+                'status' => $payment->status,
+                'snap_token' => $payment->snap_token,
+            ]
+        ]);
     }
 }
