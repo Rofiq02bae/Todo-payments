@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
+import AppLayout from '@/components/AppLayout';
 import Heading from '@/components/heading';
 import TodoForm from '@/components/TodoForm';
 import { Button } from '@/components/ui/button';
@@ -12,11 +13,10 @@ type Props = {
 
 export default function Edit({ todo }: Props) {
     return (
-        <>
+        <AppLayout>
             <Head title={`Edit: ${todo.title}`} />
 
-            <h1 className="text-2xl font-bold mb-4">Edit Todo</h1>
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex flex-1 flex-col gap-4 rounded-xl">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" asChild>
                         <Link href={TodoController.index.url()}>
@@ -33,7 +33,7 @@ export default function Edit({ todo }: Props) {
                     <TodoForm todo={todo} />
                 </div>
             </div>
-        </>
+        </AppLayout>
     );
 }
 

@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Todo;
 use App\Models\Payment;
 use App\Models\PdfExport;
+use App\Models\Todo;
+use App\Services\PaymentInvoiceMailer;
 use App\Services\PdfExportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,9 +14,10 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfController extends Controller
 {
-    public function __construct(protected PdfExportService $pdfExportService)
-    {
-    }
+    public function __construct(
+        protected PdfExportService $pdfExportService,
+        protected PaymentInvoiceMailer $paymentInvoiceMailer,
+    ) {}
 
     /**
      * Generate (or return existing) PDF for a todo.
@@ -31,7 +33,8 @@ class PdfController extends Controller
      */
     public function generate(Request $request, Todo $todo): JsonResponse
     {
-        // If order_id is provided (from Snap onSuccess), find that specific payment
+        abort_unless($todo->user_id === auth()->id(), 403);
+
         if ($request->order_id) {
             $payment = Payment::where('order_id', $request->order_id)->first();
         } else {
@@ -43,7 +46,7 @@ class PdfController extends Controller
         }
 
         // No payment found at all
-        if (!$payment) {
+        if (! $payment) {
             return response()->json([
                 'needs_payment' => true,
             ]);
@@ -59,6 +62,10 @@ class PdfController extends Controller
                 $payment->transaction_id = $request->transaction_id;
             }
             $payment->save();
+
+            if (in_array($payment->status, ['capture', 'settlement', 'success'])) {
+                $this->paymentInvoiceMailer->send($payment);
+            }
         }
 
         // Check if PDF already exists
@@ -67,9 +74,9 @@ class PdfController extends Controller
         if ($existingExport) {
             return response()->json([
                 'needs_payment' => false,
-                'already_paid'  => true,
-                'payment_id'    => $payment->id,
-                'download_url'  => route('pdf.download', $existingExport),
+                'already_paid' => true,
+                'payment_id' => $payment->id,
+                'download_url' => route('pdf.download', $existingExport),
             ]);
         }
 
@@ -79,9 +86,9 @@ class PdfController extends Controller
 
             return response()->json([
                 'needs_payment' => false,
-                'already_paid'  => false,
-                'payment_id'    => $payment->id,
-                'download_url'  => route('pdf.download', $pdfExport),
+                'already_paid' => false,
+                'payment_id' => $payment->id,
+                'download_url' => route('pdf.download', $pdfExport),
             ]);
         } catch (\Exception $e) {
             report($e);
@@ -100,7 +107,7 @@ class PdfController extends Controller
     {
         $path = $pdfExport->file_path;
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File PDF tidak ditemukan.');
         }
 
@@ -108,8 +115,8 @@ class PdfController extends Controller
             Storage::disk('public')->get($path),
             200,
             [
-                'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . basename($path) . '"',
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.basename($path).'"',
             ]
         );
     }

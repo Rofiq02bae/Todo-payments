@@ -14,13 +14,10 @@ type Props = {
 export default function TodoForm({ todo }: Props) {
     const isEditing = !!todo;
 
-    const formAction = isEditing
-        ? TodoController.update.form(todo.id)
-        : TodoController.store.form();
-
     return (
         <Form
-            {...formAction}
+            action={isEditing ? TodoController.update.url(todo.id) : TodoController.store.url()}
+            method={isEditing ? 'put' : 'post'}
             className="space-y-6"
         >
             {({ processing, errors }) => (

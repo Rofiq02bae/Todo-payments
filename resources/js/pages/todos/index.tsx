@@ -1,6 +1,7 @@
 import { Head, Link } from "@inertiajs/react";
 import { Toaster } from "sonner";
 
+import AppLayout from "@/components/AppLayout";
 import PdfDownloadModal from "@/components/PdfDownloadModal";
 import TodoCard from "@/components/TodoCard";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ export default function Index({ todos }: Props) {
   const { exportPdf, loading, modalOpen, downloadUrl, closeModal } = usePayment();
 
   return (
-    <>
+    <AppLayout>
       <Head>
         <title>Todo List</title>
       </Head>
@@ -40,8 +41,7 @@ export default function Index({ todos }: Props) {
         onClose={closeModal}
       />
 
-        <h1 className="text-2xl font-bold mb-4">Todo List</h1>
-      <div className="container flex flex-col items-center justify-center gap-6 px-4 py-8">
+      <div className="flex flex-col items-center justify-center gap-6">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Todo List</CardTitle>
@@ -69,6 +69,6 @@ export default function Index({ todos }: Props) {
           </CardContent>
         </Card>
       </div>    
-    </>
+    </AppLayout>
   );
 }

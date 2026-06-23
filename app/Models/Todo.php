@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Todo extends Model
 {
     protected $fillable = [
+        'user_id',
         'title',
         'description',
         'is_completed'
@@ -19,6 +19,11 @@ class Todo extends Model
     protected $casts = [
         'is_completed' => 'boolean',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function payments(): HasMany
     {

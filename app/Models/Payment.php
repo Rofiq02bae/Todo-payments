@@ -3,10 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Todo;
 
 class Payment extends Model
 {
@@ -18,9 +14,13 @@ class Payment extends Model
         'status',
         'snap_token',
         'transaction_id',
-        'payment_type'
+        'payment_type',
+        'invoice_sent_at',
     ];
-    
+
+    protected $casts = [
+        'invoice_sent_at' => 'datetime',
+    ];
 
     public function todo()
     {

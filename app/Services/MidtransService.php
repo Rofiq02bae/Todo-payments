@@ -29,28 +29,26 @@ class MidtransService
         }
 
         $order_id = 'TODO-'.now()->format('YmdHis').'-'.$todo->id;
-        $item_price = 100; // Set the price according to your needs
-        $todo_title = 'Export PDF Todo'; // Set the item name according to your needs
+        $item_price = 100;
+        $todo_title = 'Export PDF Todo';
         $params = [
             'transaction_details' => [
                 'order_id' => $order_id,
-                'gross_amount' => $item_price, // Set the amount according to your needs
+                'gross_amount' => $item_price,
             ],
             'item_details' => [
                 [
                     'id' => $todo->id,
-                    'price' => $item_price, // Set the price according to your needs
+                    'price' => $item_price,
                     'quantity' => 1,
                     'name' => $todo_title,
                 ],
             ],
-            
-                'customer_details' => [
-                    'first_name' => 'John',
-                    'last_name' => 'Doe',
-                    'email' => 'user@example.com',
+            'customer_details' => [
+                'first_name' => $todo->user?->name ?? 'Customer',
+                'email' => $todo->user?->email ?? 'customer@example.com',
             ],
-            ];
+        ];
 
         $snapToken = Snap::getSnapToken($params);
 

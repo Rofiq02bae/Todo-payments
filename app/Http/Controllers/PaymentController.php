@@ -16,7 +16,8 @@ class PaymentController extends Controller
 
     public function create(Todo $todo): JsonResponse
     {
-        // If todo already has a successful payment, return existing data
+        abort_unless($todo->user_id === auth()->id(), 403);
+
         $existingPaid = Payment::where('todo_id', $todo->id)
             ->whereIn('status', ['capture', 'settlement', 'success'])
             ->latest()
