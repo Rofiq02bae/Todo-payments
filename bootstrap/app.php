@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->preventRequestForgery(except: [
             'midtrans/webhook',
+            'pdf/generate/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

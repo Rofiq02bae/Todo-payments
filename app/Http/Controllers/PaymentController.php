@@ -10,13 +10,33 @@ use Illuminate\Http\JsonResponse;
 
 class PaymentController extends Controller
 {
-    public function __construct(MidtransService $midtransService)
+    public function __construct(protected MidtransService $midtransService)
     {
-        $this->midtransService = $midtransService;
     }
 
     public function create(Todo $todo): JsonResponse
     {
+        // If todo already has a successful payment, return existing data
+        $existingPaid = Payment::where('todo_id', $todo->id)
+            ->whereIn('status', ['capture', 'settlement', 'success'])
+            ->latest()
+            ->first();
+
+        if ($existingPaid) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Todo already paid',
+                'already_paid' => true,
+                'data' => [
+                    'id' => $existingPaid->id,
+                    'todo_id' => $existingPaid->todo_id,
+                    'order_id' => $existingPaid->order_id,
+                    'amount' => $existingPaid->amount,
+                    'status' => $existingPaid->status,
+                ]
+            ]);
+        }
+
         $payment = $this->midtransService->createPayment($todo);
 
         return response()->json([

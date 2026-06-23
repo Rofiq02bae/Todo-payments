@@ -26,3 +26,13 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+template.txt
+
+// agents markdown intructions
+docs/AGENTS.md
+docs/MEMORY.md
+docs/*.md
+/docs
+.agents
+.codex
